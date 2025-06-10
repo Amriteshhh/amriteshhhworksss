@@ -2,8 +2,10 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, MapPin, Phone, Download, Github, Linkedin } from 'lucide-react';
+import { Mail, MapPin, Phone, Download, Github, Linkedin, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import emailjs from '@emailjs/browser';
+import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -20,14 +24,53 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Create mailto link with form data
-    const subject = encodeURIComponent(formData.subject || 'Contact from Portfolio');
-    const body = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-    );
-    window.location.href = `mailto:amritesh2601@gmail.com?subject=${subject}&body=${body}`;
+    setIsLoading(true);
+
+    try {
+      // EmailJS configuration with your credentials
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_name: 'Amritesh Jhilpe',
+      };
+
+      await emailjs.send(
+        'service_145rbvs', // Your service ID
+        'template_db7j028', // Your template ID
+        templateParams,
+        '82rrT-Wk6UZR4iIhh' // Your public key
+      );
+
+      // Success feedback
+      toast({
+        title: "Message Sent Successfully!",
+        description: "Thank you for reaching out. I'll get back to you soon.",
+      });
+
+      // Clear form after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      });
+
+    } catch (error) {
+      console.error('EmailJS Error:', error);
+      
+      // Error feedback
+      toast({
+        title: "Failed to Send Message",
+        description: "Something went wrong. Please try again or contact me directly at amritesh2601@gmail.com",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -124,6 +167,7 @@ const Contact = () => {
                     placeholder="Your name"
                     className="bg-dark-secondary border-gray-600 text-white placeholder-gray-400 focus:border-electric"
                     required
+                    disabled={isLoading}
                   />
                 </div>
                 <div>
@@ -136,6 +180,7 @@ const Contact = () => {
                     placeholder="your.email@example.com"
                     className="bg-dark-secondary border-gray-600 text-white placeholder-gray-400 focus:border-electric"
                     required
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -150,6 +195,7 @@ const Contact = () => {
                   placeholder="What's this about?"
                   className="bg-dark-secondary border-gray-600 text-white placeholder-gray-400 focus:border-electric"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
@@ -163,14 +209,23 @@ const Contact = () => {
                   rows={5}
                   className="bg-dark-secondary border-gray-600 text-white placeholder-gray-400 focus:border-electric resize-none"
                   required
+                  disabled={isLoading}
                 />
               </div>
               
               <Button 
                 type="submit" 
                 className="w-full bg-electric hover:bg-electric/80 text-black font-semibold py-3 glow-effect"
+                disabled={isLoading}
               >
-                Send Message
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending Message...
+                  </>
+                ) : (
+                  'Send Message'
+                )}
               </Button>
             </form>
           </div>
