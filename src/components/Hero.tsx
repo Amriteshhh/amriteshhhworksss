@@ -16,9 +16,9 @@ const Hero = () => {
         <div className="animate-fade-in">
           <div className="mb-6">
             <img 
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face"
+              src="https://i.postimg.cc/8P9VQKzK/Amritesh-DP-profile.jpg"
               alt="Amritesh Jhilpe"
-              className="w-32 h-32 rounded-full mx-auto border-4 border-electric glow-effect"
+              className="w-32 h-32 rounded-full mx-auto border-4 border-electric glow-effect object-cover"
             />
           </div>
           
